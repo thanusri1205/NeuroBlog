@@ -1,0 +1,173 @@
+.vb-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #355c7d, #6c5b7b, #c06c84);
+  background-size: 400% 400%;
+  animation: gradientBG 12s ease infinite;
+  color: #fff;
+}
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+/* Categories */
+.categories {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.categories button {
+  background: rgba(0,0,0,0.4);
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.categories button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+/* Blog cards */
+.blogs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.blog-card {
+  background: rgba(0,0,0,0.5);
+  border-radius: 12px;
+  padding: 1rem;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.blog-card:hover {
+  transform: translateY(-5px);
+}
+.blog-card h3 {
+  margin: 0;
+}
+.blog-card .likes {
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  background: rgba(0,0,0,0.6);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  display: none;
+}
+.blog-card:hover .likes {
+  display: block;
+}
+/* Full blog modal */
+.modal {
+  display: none; /* will be "flex" in inline style when open */
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  z-index: 9999;
+}
+.modal-content {
+  background: rgba(0,0,0,0.9);
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 100%;
+  color: #fff;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-content h2 {
+  margin-top: 0;
+}
+.meta {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 1rem;
+}
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #ff4e50;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #fff;
+}
+.actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.actions button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #fff;
+  background: linear-gradient(135deg, #ff758c, #ff7eb3);
+}
+.actions button:hover {
+  opacity: 0.9;
+}
+/* Comments Section */
+.comments {
+  margin-top: 2rem;
+}
+.comments h3 {
+  margin-bottom: 1rem;
+}
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.comment-list li {
+  background: rgba(255,255,255,0.1);
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 0.7rem;
+}
+.comment-input {
+  display: flex;
+  gap: 0.5rem;
+}
+.comment-input input {
+  flex: 1;
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+.comment-input button {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background: #ff758c;
+  color: #fff;
+  cursor: pointer;
+}
+.comment-input button:hover {
+  background: #ff4e50;
+}
