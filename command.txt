@@ -1,0 +1,28 @@
+uvicorn app:app --reload --host 0.0.0.0 --port 8000
+
+cd C:\Users\rupas\OneDrive\Documents\MINI_PROJECT\neuroblog
+
+ npm install
+
+ npm run dev
+--------------------------------------------------------------
+****************to update git:********************************
+cd "C:\Users\rupas\OneDrive\Documents\MINI_PROJECT(MAIN)"
+git add .
+git commit -m "your message"
+git push origin main -v
+----------------------------or--------------------------------
+if Git LFS Network Timeout Error - Here's the quick fix:
+
+git config lfs."https://github.com/shreeragula/NeuroBlog.git/info/lfs.locksverify" false
+
+git push origin main -v
+
+
+
+
+------##### To run databse ######------------
+
+cd backend
+
+python -m uvicorn app:app --reload

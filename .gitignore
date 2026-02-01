@@ -1,0 +1,72 @@
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+
+
+
+# Ignore dataset files
+*.csv
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+dist/
+build/
+
+# Environment / secrets
+.env
+
+# Logs
+*.log
+193k.csv
+
+
+
+# =====================
+# Frontend (React/Vite)
+# =====================
+node_modules/
+dist/
+.vite/
+
+# =====================
+# Backend (Python/FastAPI)
+# =====================
+__pycache__/
+*.pyc
+.env
+venv/
+
+# =====================
+# Misc
+# =====================
+*.log
+.DS_Store
