@@ -278,3 +278,69 @@ h1 {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
 }
+.blog-card-box {
+  background: #111827;
+  border-radius: 12px;
+  padding: 15px;
+  transition: 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.blog-card-box:hover {
+  transform: translateY(-5px);
+}
+
+.box-image {
+  height: 150px;
+  overflow: hidden;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.box-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.box-content h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.box-preview {
+  font-size: 14px;
+  opacity: 0.8;
+}
+.blog-card-box {
+  display: flex;
+  gap: 15px;
+}
+
+.box-image {
+  width: 120px;
+  height: 100px;
+  flex-shrink: 0;
+}
+.blog-content {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+
+.blog-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.modal-content {
+  max-width: 900px;
+  width: 90%;
+  margin: auto;
+  overflow-y: auto;
+}

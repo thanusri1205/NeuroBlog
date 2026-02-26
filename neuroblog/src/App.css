@@ -120,3 +120,46 @@ footer {
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+/* ================= THEMES ================= */
+
+body.dark-theme {
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+body.light-theme {
+  background-color: #f5f5f5;
+  color: #111111;
+}
+
+/* ================= FONTS ================= */
+
+body.font-arial {
+  font-family: Arial, sans-serif;
+}
+
+body.font-verdana {
+  font-family: Verdana, sans-serif;
+}
+
+body.font-times {
+  font-family: "Times New Roman", serif;
+}
+
+body.font-courier {
+  font-family: "Courier New", monospace;
+}
+
+/* ================= FONT SIZES ================= */
+
+body.font-small {
+  font-size: 14px;
+}
+
+body.font-medium {
+  font-size: 16px;
+}
+
+body.font-large {
+  font-size: 18px;
+}

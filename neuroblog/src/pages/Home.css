@@ -97,45 +97,58 @@ nav a:hover {
   pointer-events: none;
 }
 
+/* ================= PROFILE DROPDOWN ================= */
+
 .dropdown {
-  display: none;
   position: absolute;
-  top: 40px;
   right: 0;
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 6px;
-  padding: 0.5rem 0;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-  min-width: 150px;
-}
-.profile:hover .dropdown {
-  display: block;
-}
-.dropdown a {
-  display: block;
-  padding: 0.7rem 1rem;
-  text-decoration: none;
-  color: #fff;
-  font-size: 0.9rem;
-  transition: background 0.3s ease;
+  top: 55px;
+  width: 200px;
+  background: linear-gradient(135deg, #355c7d, #6c5b7b);
+  border-radius: 14px;
+  padding: 10px 0;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.2s ease-in-out;
+  z-index: 1000;
 }
 
-.dropdown a:hover {
-  background: #ff758c;
-}
-.dropdown-link {
-  display: block;
-  padding: 0.7rem 1rem;
+/* Remove default button styling */
+.dropdown button {
   width: 100%;
-  background: none;
-  color: #fff;
+  background: transparent;
   border: none;
+  color: #ffffff;
+  padding: 12px 18px;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.25s ease;
 }
 
+/* Hover effect */
+.dropdown button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  padding-left: 22px;
+}
+
+/* Add subtle divider */
+.dropdown button:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
 
 
@@ -170,6 +183,9 @@ nav a:hover {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
   text-align: left;
+  max-height: 500px;        /* Adjust height as needed */
+  overflow-y: auto;         /* Enables vertical scroll */
+  padding-right: 8px; 
 }
 
 .popular-blogs h2 {
@@ -224,4 +240,135 @@ nav a:hover {
 .feature-card p {
   font-size: 1rem;
   color: #f1f1f1;
+}
+
+.notification-wrapper {
+  position: relative;   /* THIS IS CRITICAL */
+  display: inline-block;
+}
+
+.notification-dropdown {
+  position: absolute;      /* makes it a dropdown */
+  top: 40px;               /* below bell icon */
+  right: 0;                /* align to bell */
+  width: 300px;
+
+  background: black;     /* matches your dark theme */
+  color: white;
+  border-radius: 10px;
+  padding: 12px;
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  z-index: 9999;           /* above everything */
+}
+
+.home-blog-card {
+  display: flex;
+  gap: 15px;
+  background: rgba(0,0,0,0.4);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  transition: 0.3s;
+}
+
+.home-blog-card:hover {
+  transform: translateY(-3px);
+}
+
+.home-thumbnail {
+  width: 100px;
+  height: 80px;
+  overflow: hidden;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.home-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-blog-content h3 {
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.home-blog-content small {
+  opacity: 0.7;
+  font-size: 12px;
+}
+.popular-blogs::-webkit-scrollbar {
+  width: 8px;
+}
+
+.popular-blogs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popular-blogs::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+.popular-blogs::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.notification-dropdown {
+  position: absolute;
+  right: 20px;
+  top: 65px;
+  width: 280px;   /* 🔥 smaller width */
+  background: linear-gradient(135deg, #355c7d, #6c5b7b);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  padding: 14px 0;
+  z-index: 1000;
+  animation: fadeIn 0.25s ease-in-out;
+  color: #ffffff;
+}
+
+.notification-header {
+  font-weight: 700;
+  font-size: 15px;
+  padding: 0 18px 10px 18px;
+  margin-bottom: 6px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;   /* 🔥 professional look */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.notification-item {
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 10px;
+  margin: 4px 10px;
+}
+
+.notification-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(3px);
+}
+
+.notification-title {
+  font-size: 13px;   /* 🔥 slightly smaller text */
+  font-weight: 500;
+  line-height: 1.4;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

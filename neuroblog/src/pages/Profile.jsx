@@ -8,11 +8,17 @@ export default function Profile() {
     bio: "",
     pic: "https://via.placeholder.com/120",
   });
+
   const [formData, setFormData] = useState({ name: "", bio: "", pic: null });
   const [isEditing, setIsEditing] = useState(false);
   const [preview, setPreview] = useState(null);
-  const [followers, setFollowers] = useState(0);
-  const [following, setFollowing] = useState(0);
+
+  // ✅ NEW: Likes / Dislikes state
+  const [stats, setStats] = useState({
+    likes: 0,
+    dislikes: 0,
+  });
+
   const [postsCount, setPostsCount] = useState(0);
   const [saveMsg, setSaveMsg] = useState(false);
 
@@ -29,34 +35,44 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    const uid = Number(localStorage.getItem("userId"));
-    if (!uid) return;
-    setUserId(uid);
-
-    let storedProfile = {
-      name: localStorage.getItem("profileName") || "",
-      bio: localStorage.getItem("profileBio") || "",
-      pic: localStorage.getItem("profilePic") || "https://via.placeholder.com/120",
-    };
-
-    if (!storedProfile.name) {
-      const email = localStorage.getItem("userEmail") || "";
-      storedProfile.name = email.split("@")[0] || "User Name";
+  // ✅ NEW: Fetch Likes / Dislikes
+  const fetchReactionSummary = async (username) => {
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:8000/users/${username}/reaction-summary`
+      );
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      setStats(data);
+    } catch (err) {
+      console.error("Reaction summary error:", err);
     }
+  };
 
-    setProfile(storedProfile);
+  // 🔥 LOAD PROFILE FROM BACKEND
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    const users = JSON.parse(localStorage.getItem("users")) || {};
-    const userData = users[uid] || { followers: [], following: [] };
-    setFollowers(userData.followers.length);
-    setFollowing(userData.following.length);
+    fetch("http://127.0.0.1:8000/me", {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setUserId(data.id);
 
-    fetchPostCount(uid);
+        setProfile({
+          name: data.username,
+          bio: data.bio || "",
+          pic: data.profile_picture || "https://via.placeholder.com/120",
+        });
 
-    const refresh = () => fetchPostCount(uid);
-    window.addEventListener("postsUpdated", refresh);
-    return () => window.removeEventListener("postsUpdated", refresh);
+        fetchPostCount(data.id);
+        fetchReactionSummary(data.username); // ✅ load likes/dislikes
+      })
+      .catch((err) => console.error("Profile load error:", err));
   }, []);
 
   const startEditing = () => {
@@ -76,33 +92,45 @@ export default function Profile() {
     }
   };
 
-  const handleSave = (e) => {
+  // 🔥 SAVE PROFILE TO BACKEND
+  const handleSave = async (e) => {
     e.preventDefault();
-    const updatedProfile = { ...profile, name: formData.name, bio: formData.bio };
-    const file = fileRef.current?.files[0];
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        updatedProfile.pic = e.target.result;
-        finalizeSave(updatedProfile);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      finalizeSave(updatedProfile);
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          username: formData.name,
+          bio: formData.bio,
+          profile_picture: preview || profile.pic,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Update failed");
+
+      const data = await response.json();
+
+      setProfile({
+        name: data.username,
+        bio: data.bio || "",
+        pic: data.profile_picture || profile.pic,
+      });
+
+      // reload reaction summary if username changed
+      fetchReactionSummary(data.username);
+
+      setIsEditing(false);
+      setSaveMsg(true);
+      setTimeout(() => setSaveMsg(false), 2000);
+    } catch (err) {
+      console.error("Profile update error:", err);
     }
-  };
-
-  const finalizeSave = (updatedProfile) => {
-    setProfile(updatedProfile);
-    localStorage.setItem("profileName", updatedProfile.name);
-    localStorage.setItem("profileBio", updatedProfile.bio);
-    localStorage.setItem("profilePic", updatedProfile.pic);
-    setIsEditing(false);
-    setFormData({ name: "", bio: "", pic: null });
-    setPreview(null);
-    setSaveMsg(true);
-    setTimeout(() => setSaveMsg(false), 2000);
   };
 
   return (
@@ -112,41 +140,37 @@ export default function Profile() {
         {/* HEADER */}
         <div className="profile-header">
           <div className="avatar-wrapper">
-  <img
-    src={preview || profile.pic}
-    alt="Profile"
-    className="profile-pic"
-  />
+            <img
+              src={preview || profile.pic}
+              alt="Profile"
+              className="profile-pic"
+            />
 
-  {/* Hidden file input */}
-  <input
-    type="file"
-    ref={fileRef}
-    accept="image/*"
-    onChange={handleFileChange}
-    id="profilePicInput"
-    style={{ display: "none" }}
-  />
+            <input
+              type="file"
+              ref={fileRef}
+              accept="image/*"
+              onChange={handleFileChange}
+              id="profilePicInput"
+              style={{ display: "none" }}
+            />
 
-  {/* Overlay label */}
-  <label htmlFor="profilePicInput" className="change-pic-overlay">
-    Change Profile Picture
-  </label>
-</div>
+            <label htmlFor="profilePicInput" className="change-pic-overlay">
+              Change Profile Picture
+            </label>
+          </div>
 
           <div className="profile-info">
             <h2>{profile.name || "User Name"}</h2>
-            <p className="user-id">
-              User ID: <strong>{userId}</strong>
-            </p>
             <p>{profile.bio || "No bio added"}</p>
 
+            {/* ✅ UPDATED STATS SECTION */}
             <div className="stats">
               <div className="stat">
-                <span>{followers}</span> Followers
+                <span>{stats.likes}</span> Likes
               </div>
               <div className="stat">
-                <span>{following}</span> Following
+                <span>{stats.dislikes}</span> Dislikes
               </div>
               <div className="stat">
                 <span>{postsCount}</span> Posts
@@ -170,28 +194,51 @@ export default function Profile() {
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
               />
 
               <label>Bio</label>
               <textarea
                 value={formData.bio}
-                onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                }
               />
 
               <label>Profile Picture</label>
-              <input type="file" ref={fileRef} accept="image/*" onChange={handleFileChange} />
+              <input
+                type="file"
+                ref={fileRef}
+                accept="image/*"
+                onChange={handleFileChange}
+              />
 
-              {preview && <img src={preview} alt="Preview" className="profile-preview" />}
+              {preview && (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="profile-preview"
+                />
+              )}
 
               <div className="edit-actions">
                 <button type="submit">Save</button>
-                <button type="button" className="cancel-btn" onClick={() => setIsEditing(false)}>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setIsEditing(false)}
+                >
                   Cancel
                 </button>
               </div>
 
-              {saveMsg && <span className="save-msg" style={{ opacity: 1 }}>Saved!</span>}
+              {saveMsg && (
+                <span className="save-msg" style={{ opacity: 1 }}>
+                  Saved!
+                </span>
+              )}
             </form>
           </div>
         )}

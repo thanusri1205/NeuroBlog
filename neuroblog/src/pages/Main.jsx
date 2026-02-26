@@ -8,7 +8,7 @@ export default function Main() {
   return (
     <div className="main-bg">
       <header>
-        <div className="logo">BlogSphere</div>
+        <div className="logo">Neuroblog</div>
         <nav>
           <a href="#about">About</a>
           <a href="#contact">Contact</a>
@@ -20,6 +20,7 @@ export default function Main() {
           </button>
         </nav>
       </header>
+
       <section className="hero">
         <img
           src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png"
@@ -30,19 +31,24 @@ export default function Main() {
           A creative space to write, read, and share your stories with the world.
         </p>
       </section>
+
       <section id="about">
         <h2>About the Website</h2>
         <p>
-          BlogSphere is a simple and modern blogging platform where you can
+          Neuroblog is a simple and modern blogging platform where you can
           publish your thoughts, tutorials, and ideas. It combines ease of use
           with elegant motion effects for a delightful experience.
+          With our integrated AI Blog Generator, you can create engaging, 
+          well-structured blogs in seconds and bring your ideas to life effortlessly.
         </p>
       </section>
+
       <section id="contact">
         <h2>Contact Us</h2>
         <p>Email: support@blogsphere.com</p>
         <p>Phone: +91-9876543210</p>
       </section>
+
       <footer>© 2025 BlogSphere — Built with ♥</footer>
     </div>
   );

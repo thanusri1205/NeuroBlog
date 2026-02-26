@@ -156,3 +156,26 @@
 .link-action:hover {
   text-decoration: underline;
 }
+
+.success {
+  color: #4caf50;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+.password-rules {
+  margin-top: 10px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.password-rules p {
+  margin: 4px 0;
+  color: #aaa;
+  transition: 0.3s ease;
+}
+
+.password-rules p.valid {
+  color: #2ecc71;
+  font-weight: 500;
+}

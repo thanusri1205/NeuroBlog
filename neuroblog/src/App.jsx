@@ -1,13 +1,15 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import CreateBlog from "./pages/CreateBlog";  
+import CreateBlog from "./pages/CreateBlog";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ViewBlog from "./pages/ViewBlog";
+import BlogDetails from "./pages/BlogDetails";   // ✅ NEW IMPORT
 
 export default function App() {
   return (
@@ -17,10 +19,13 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/view" element={<ViewBlog />} /> 
-        <Route path="/create" element={<CreateBlog />} />  
+        <Route path="/view" element={<ViewBlog />} />
+        <Route path="/create" element={<CreateBlog />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+
+        {/* ✅ NEW DYNAMIC BLOG ROUTE */}
+        <Route path="/blog/:id" element={<BlogDetails />} />
       </Routes>
     </Router>
   );

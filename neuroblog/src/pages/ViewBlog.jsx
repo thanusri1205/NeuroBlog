@@ -1,121 +1,139 @@
 import React, { useEffect, useState } from "react";
+import ReactQuill from "react-quill-new";
+import "quill/dist/quill.snow.css";
 import "./ViewBlog.css";
 
-export default function ViewBlog() {
-  // Current logged-in user ID from localStorage
-  const currentUserId = Number(localStorage.getItem("userId")) || 1;
+// ================= QUILL TOOLBAR =================
+const modules = {
+  toolbar: [
+    [{ font: [] }],
+    [{ size: ["small", false, "large", "huge"] }],
+    ["bold", "italic", "underline", "strike"],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["link", "image"],
+    ["clean"]
+  ]
+};
 
-  // States
-  const [blogs, setBlogs] = useState([]);
-  const [selectedBlog, setSelectedBlog] = useState(null);
+export default function ViewBlog() {
+
+  const [posts, setPosts] = useState([]);
+  const [selectedPost, setSelectedPost] = useState(null);
   const [viewType, setViewType] = useState("grid");
   const [loading, setLoading] = useState(true);
 
-  // Edit states
   const [isEditing, setIsEditing] = useState(false);
+  const [editingPost, setEditingPost] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editContent, setEditContent] = useState("");
 
-  // Fetch blogs on component mount
+  // ================= FETCH POSTS =================
   useEffect(() => {
-    fetchBlogs();
-  }, [currentUserId]);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
 
-  const fetchBlogs = async () => {
-    setLoading(true);
+    fetch("http://127.0.0.1:8000/my-posts", {
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        const formatted = data.map(post => ({
+          id: post.id,
+          title: post.title || "Untitled",
+          author: post.username,
+          date: post.timestamp
+            ? new Date(post.timestamp).toLocaleDateString()
+            : "No date",
+          content: post.content
+        }));
+
+        setPosts(formatted);
+      })
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
+
+  }, []);
+
+  // ================= UPDATE BLOG =================
+  const handleUpdate = async () => {
+    const token = localStorage.getItem("token");
+
     try {
-      const res = await fetch("http://127.0.0.1:8000/posts");
-      if (!res.ok) throw new Error("Network response was not ok");
-
-      const posts = await res.json();
-
-      console.log("Fetched posts from backend:", posts);
-
-      // Filter posts for the current user
-      const userBlogs = posts.filter(
-        post => post.user_id.toString() === currentUserId.toString()
+      const response = await fetch(
+        `http://127.0.0.1:8000/posts/${editingPost.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({
+            title: editTitle,
+            content: editContent
+          })
+        }
       );
 
-      console.log("Filtered blogs for current user:", userBlogs);
+      const updatedPost = await response.json();
 
-      // Format for frontend display
-      const formattedBlogs = userBlogs.map(post => ({
-        id: post.id,
-        title: post.title || "Untitled",
-        content: post.content || "",
-        user_id: post.user_id,
-        timestamp: post.timestamp,
-        likes: post.likes || 0,
-        shares: post.shares || 0,
-        author: `User ${post.user_id}`,
-        date: post.timestamp
-          ? new Date(post.timestamp).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-            })
+      const updatedFormatted = {
+        id: updatedPost.id,
+        title: updatedPost.title,
+        author: updatedPost.username,
+        date: updatedPost.timestamp
+          ? new Date(updatedPost.timestamp).toLocaleDateString()
           : "No date",
-      }));
+        content: updatedPost.content
+      };
 
-      setBlogs(formattedBlogs);
-    } catch (err) {
-      console.error("Error fetching blogs:", err);
-      setBlogs([]);
-    } finally {
-      setLoading(false);
+      setPosts(posts.map(p =>
+        p.id === updatedFormatted.id ? updatedFormatted : p
+      ));
+
+      setIsEditing(false);
+      setEditingPost(null);
+      setSelectedPost(updatedFormatted);
+
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const deleteBlog = async id => {
-    const ok = window.confirm("Delete this blog?");
-    if (!ok) return;
+  // ================= DELETE BLOG =================
+  const handleDelete = async (id) => {
+    const token = localStorage.getItem("token");
+
+    if (!window.confirm("Delete this blog?")) return;
 
     try {
-      await fetch(`http://127.0.0.1:8000/posts/${id}?user_id=${currentUserId}`, {
+      await fetch(`http://127.0.0.1:8000/posts/${id}`, {
         method: "DELETE",
-      });
-      setSelectedBlog(null);
-      setIsEditing(false);
-      fetchBlogs();
-    } catch (err) {
-      console.error("Error deleting blog:", err);
-    }
-  };
-
-  const saveEdit = async () => {
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/posts/${selectedBlog.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: editTitle,
-          content: editContent,
-          user_id: currentUserId,
-        }),
+        headers: {
+          "Authorization": "Bearer " + token
+        }
       });
 
-      if (!res.ok) throw new Error("Update failed");
+      setPosts(posts.filter(post => post.id !== id));
+      setSelectedPost(null);
 
-      let updatedBlog;
-      try {
-        updatedBlog = await res.json();
-      } catch {
-        updatedBlog = { ...selectedBlog, title: editTitle, content: editContent };
-      }
-
-      setBlogs(prev => prev.map(b => (b.id === updatedBlog.id ? updatedBlog : b)));
-      setSelectedBlog(updatedBlog);
-      setIsEditing(false);
-    } catch (err) {
-      console.error("Error saving blog:", err);
+    } catch (error) {
+      console.error(error);
     }
   };
 
   return (
     <div className="vb-bg">
       <h1>My Blogs</h1>
-      <p>You have {blogs.length} blog(s)</p> {/* Number of blogs for current user */}
+      <p>You have {posts.length} blog(s)</p>
 
-      {/* VIEW TOGGLE */}
+      {/* ================= VIEW TOGGLE ================= */}
       <div className="view-toggle">
         <button
           className={viewType === "grid" ? "active" : ""}
@@ -123,6 +141,7 @@ export default function ViewBlog() {
         >
           ⬛ Box View
         </button>
+
         <button
           className={viewType === "list" ? "active" : ""}
           onClick={() => setViewType("list")}
@@ -131,43 +150,63 @@ export default function ViewBlog() {
         </button>
       </div>
 
-      {/* BLOG LIST */}
+      {/* ================= BLOG LIST ================= */}
       {loading ? (
         <p className="status">Loading blogs...</p>
-      ) : blogs.length === 0 ? (
+      ) : posts.length === 0 ? (
         <p className="status">No blogs created yet.</p>
       ) : (
         <div className={`blogs ${viewType}`}>
-          {blogs.map(blog => (
-            <div
-              key={blog.id}
-              className="blog-card"
-              onClick={() => {
-                setSelectedBlog(blog);
-                setIsEditing(false);
-              }}
-            >
-              <h3>{blog.title}</h3>
-              <p>{blog.content?.slice(0, 120)}...</p>
-              <div className="stats">
-                ❤️ {blog.likes} &nbsp;&nbsp; 🔁 {blog.shares}
+          {posts.map((blog) => {
+
+            const imgMatch = blog.content.match(/<img[^>]+src="([^">]+)"/);
+            const firstImage = imgMatch ? imgMatch[1] : null;
+            const textOnly = blog.content.replace(/<img[^>]*>/g, "");
+
+            return (
+              <div
+                key={blog.id}
+                className="blog-card-box"
+                onClick={() => {
+                  setSelectedPost(blog);
+                  setIsEditing(false);
+                }}
+              >
+                {firstImage && (
+                  <div className="box-image">
+                    <img src={firstImage} alt="thumbnail" />
+                  </div>
+                )}
+
+                <div className="box-content">
+                  <h3>{blog.title}</h3>
+
+                  <div
+                    className="box-preview blog-content"
+                    dangerouslySetInnerHTML={{
+                      __html: textOnly.slice(0, 120) + "..."
+                    }}
+                  />
+
+                  <div className="blog-meta">
+                    {blog.author} • {blog.date}
+                  </div>
+                </div>
               </div>
-              <div className="author-date">
-                {blog.author} | {blog.date}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
-      {/* MODAL */}
-      {selectedBlog && (
+      {/* ================= MODAL ================= */}
+      {selectedPost && (
         <div className="modal">
           <div className="modal-content">
+
             <button
               className="close-btn"
               onClick={() => {
-                setSelectedBlog(null);
+                setSelectedPost(null);
                 setIsEditing(false);
               }}
             >
@@ -176,55 +215,61 @@ export default function ViewBlog() {
 
             {isEditing ? (
               <div className="edit-form">
-                <div>
-                  <label>Title</label>
-                  <input value={editTitle} onChange={e => setEditTitle(e.target.value)} />
-                </div>
-                <div>
-                  <label>Content</label>
-                  <textarea
-                    value={editContent}
-                    onChange={e => setEditContent(e.target.value)}
-                    rows={6}
-                  />
-                </div>
+                <label>Title</label>
+                <input
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                />
+
+                <label>Content</label>
+
+                {/* 🔥 REPLACED TEXTAREA WITH REACTQUILL */}
+                <ReactQuill
+                  theme="snow"
+                  value={editContent}
+                  onChange={setEditContent}
+                  modules={modules}
+                />
+
                 <div className="actions">
-                  <button onClick={saveEdit}>Save</button>
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setEditTitle(selectedBlog.title);
-                      setEditContent(selectedBlog.content);
-                    }}
-                  >
-                    Cancel
-                  </button>
+                  <button onClick={handleUpdate}>Save</button>
+                  <button onClick={() => setIsEditing(false)}>Cancel</button>
                 </div>
               </div>
             ) : (
               <>
-                <h2>{selectedBlog.title}</h2>
-                <p>{selectedBlog.content}</p>
-                <div className="stats">
-                  ❤️ {selectedBlog.likes} &nbsp;&nbsp; 🔁 {selectedBlog.shares}
+                <h2>{selectedPost.title}</h2>
+
+                <div
+                  className="blog-content"
+                  dangerouslySetInnerHTML={{
+                    __html: selectedPost.content
+                  }}
+                />
+
+                <div className="blog-meta">
+                  {selectedPost.author} • {selectedPost.date}
                 </div>
-                <div className="author-date">
-                  {selectedBlog.author} | {selectedBlog.date}
-                </div>
+
                 <div className="actions">
                   <button
                     onClick={() => {
                       setIsEditing(true);
-                      setEditTitle(selectedBlog.title);
-                      setEditContent(selectedBlog.content);
+                      setEditingPost(selectedPost);
+                      setEditTitle(selectedPost.title);
+                      setEditContent(selectedPost.content);
                     }}
                   >
                     Edit
                   </button>
-                  <button onClick={() => deleteBlog(selectedBlog.id)}>Delete</button>
+
+                  <button onClick={() => handleDelete(selectedPost.id)}>
+                    Delete
+                  </button>
                 </div>
               </>
             )}
+
           </div>
         </div>
       )}

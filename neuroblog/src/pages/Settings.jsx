@@ -1,104 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Settings.css";
 
 export default function Settings() {
-  const [security, setSecurity] = useState({
-    username: "",
-    email: "",
-    additionalEmail: "",
-    phone: "",
-    password: "",
-  });
-
   const [viewMode, setViewMode] = useState({
     theme: "dark",
     font: "arial",
     fontSize: "medium",
   });
 
-  // Optionally implement save logic here (e.g. API/localStorage)
-  const handleSecuritySubmit = (e) => {
-    e.preventDefault();
-    alert("Security settings saved!");
+  /* ================= LOAD SAVED SETTINGS ================= */
+  useEffect(() => {
+    const saved = localStorage.getItem("viewSettings");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setViewMode(parsed);
+      applySettings(parsed);
+    }
+  }, []);
+
+  /* ================= APPLY SETTINGS ================= */
+  const applySettings = (settings) => {
+    const body = document.body;
+
+    // Remove old classes
+    body.classList.remove("light-theme", "dark-theme");
+    body.classList.remove("font-arial", "font-verdana", "font-times", "font-courier");
+    body.classList.remove("font-small", "font-medium", "font-large");
+
+    // Add new theme
+    body.classList.add(`${settings.theme}-theme`);
+
+    // Add font
+    body.classList.add(`font-${settings.font}`);
+
+    // Add font size
+    body.classList.add(`font-${settings.fontSize}`);
   };
 
-  const handleViewSubmit = (e) => {
-    e.preventDefault();
-    alert("View mode settings saved!");
-  };
-
-  const handleSecInput = (e) => {
-    setSecurity({ ...security, [e.target.id]: e.target.value });
-  };
-
-  const handleViewInput = (e) => {
+  const handleChange = (e) => {
     setViewMode({ ...viewMode, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    localStorage.setItem("viewSettings", JSON.stringify(viewMode));
+    applySettings(viewMode);
+    alert("View settings applied successfully!");
   };
 
   return (
     <div className="settings-bg">
       <div className="settings-container">
-        {/* Security Settings */}
-        <form className="section" onSubmit={handleSecuritySubmit}>
-          <h2>🔐 Security Settings</h2>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            placeholder="Enter username"
-            value={security.username}
-            onChange={handleSecInput}
-          />
-
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter email"
-            value={security.email}
-            onChange={handleSecInput}
-          />
-
-          <label htmlFor="additionalEmail">Additional Email</label>
-          <input
-            type="email"
-            id="additionalEmail"
-            placeholder="Enter backup email"
-            value={security.additionalEmail}
-            onChange={handleSecInput}
-          />
-
-          <label htmlFor="phone">Phone Number</label>
-          <input
-            type="tel"
-            id="phone"
-            placeholder="Enter phone number"
-            value={security.phone}
-            onChange={handleSecInput}
-          />
-
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter new password"
-            value={security.password}
-            onChange={handleSecInput}
-          />
-
-          <button type="submit">Save Security Settings</button>
-        </form>
-        {/* View Mode Settings */}
-        <form className="section" onSubmit={handleViewSubmit}>
+        <form className="section" onSubmit={handleSubmit}>
           <h2>🎨 View Mode Settings</h2>
+
           <label htmlFor="theme">Theme</label>
-          <select id="theme" value={viewMode.theme} onChange={handleViewInput}>
+          <select id="theme" value={viewMode.theme} onChange={handleChange}>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
           </select>
 
           <label htmlFor="font">Font Style</label>
-          <select id="font" value={viewMode.font} onChange={handleViewInput}>
+          <select id="font" value={viewMode.font} onChange={handleChange}>
             <option value="arial">Arial</option>
             <option value="verdana">Verdana</option>
             <option value="times">Times New Roman</option>
@@ -106,11 +69,12 @@ export default function Settings() {
           </select>
 
           <label htmlFor="fontSize">Font Size</label>
-          <select id="fontSize" value={viewMode.fontSize} onChange={handleViewInput}>
+          <select id="fontSize" value={viewMode.fontSize} onChange={handleChange}>
             <option value="small">Small</option>
             <option value="medium">Medium</option>
             <option value="large">Large</option>
           </select>
+
           <button type="submit">Save View Settings</button>
         </form>
       </div>

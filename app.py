@@ -33,7 +33,7 @@ class PromptResponse(BaseModel):
 tokenizer = None
 model = None
 device = "cuda" if torch.cuda.is_available() else "cpu"
-MODEL_PATH = "C:/Users/rupas/OneDrive/Documents/MINI_PROJECT/fast-blog-llm-final"
+MODEL_PATH = "D:\Users\thanu\NeuroBlog\fast-blog-llm-final"
 
 @app.on_event("startup")
 async def load_model():
